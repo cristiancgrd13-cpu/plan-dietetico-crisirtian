@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plan Dietético · Crisirtian Campos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a2332;
+      --card-hover: #243044;
+      --accent: #00b4d8;
+      --accent-soft: rgba(0, 180, 216, 0.15);
+      --green: #2dd4bf;
+      --green-soft: rgba(45, 212, 191, 0.2);
+      --text: #e8eef4;
+      --text-muted: #8b9cb3;
+      --border: #2a3648;
+      --entreno: #f59e0b;
+      --entreno-soft: rgba(245, 158, 11, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    /* ===== HEADER / RELOJ ===== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: linear-gradient(180deg, #0f1419 80%, transparent);
+      padding: 1.25rem 1.5rem 1rem;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .brand h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .brand span {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .clock-box {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.2rem;
+    }
+
+    .clock-date {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: capitalize;
+    }
+
+    .clock-time {
+      font-size: 1.75rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.05em;
+      color: var(--text);
+    }
+
+    .clock-time span {
+      color: var(--accent);
+    }
+
+    /* ===== MAIN ===== */
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-title::before {
+      content: '';
+      width: 4px;
+      height: 1.1em;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    /* ===== CALENDARIO SEMANAL ===== */
+    .week-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.75rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+
+    @media (max-width: 1100px) {
+      .week-grid {
+        grid-template-columns: repeat(4, minmax(180px, 1fr));
+      }
+    }
+
+    @media (max-width: 700px) {
+      .week-grid {
+        grid-template-columns: repeat(2, minmax(160px, 1fr));
+      }
+    }
+
+    @media (max-width: 420px) {
+      .week-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .day-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.15s;
+      min-width: 0;
+    }
+
+    .day-card:hover {
+      border-color: var(--accent);
+    }
+
+    .day-card.today {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-soft);
+    }
+
+    .day-header {
+      padding: 0.75rem 0.85rem;
+      background: rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .day-header.entreno {
+      background: var(--entreno-soft);
+    }
+
+    .day-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .badge-entreno {
+      font-size: 0.65rem;
+      font-weight: 600;
+      background: var(--entreno);
+      color: #111;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .day-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .meals {
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .meal {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      padding: 0.45rem 0.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+      user-select: none;
+    }
+
+    .meal:hover {
+      background: var(--card-hover);
+    }
+
+    .meal.done {
+      background: var(--green-soft);
+    }
+
+    .meal.done .meal-name {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .meal-check {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--border);
+      border-radius: 5px;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      background: transparent;
+    }
+
+    .meal.done .meal-check {
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    .meal.done .meal-check::after {
+      content: '✓';
+      color: #0f1419;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .meal-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .meal-slot {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      margin-bottom: 0.1rem;
+    }
+
+    .meal-name {
+      font-size: 0.78rem;
+      font-weight: 500;
+      line-height: 1.3;
+      color: var(--text);
+    }
+
+    /* ===== FOOTER / PROGRESO ===== */
+    .progress-bar-wrap {
+      margin-top: 1.75rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-label span:last-child {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .progress-track {
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--green));
+      border-radius: 4px;
+      transition: width 0.3s ease;
+      width: 0%;
+    }
+
+    .reset-btn {
+      margin-top: 1rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      padding: 0.45rem 0.9rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+
+    .reset-btn:hover {
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    .footer-note {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <h1>Plan Dietético</h1>
+        <span>Crisirtian Campos · Seguimiento semanal</span>
+      </div>
+      <div class="clock-box">
+        <div class="clock-date" id="clock-date">—</div>
+        <div class="clock-time" id="clock-time">00:00:<span>00</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <h2 class="section-title">Calendario semanal</h2>
+
+    <div class="week-grid" id="week-grid">
+      <!-- Se genera con JS -->
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-label">
+        <span>Comidas completadas esta semana</span>
+        <span id="progress-text">0 / 42</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <button class="reset-btn" id="reset-btn" title="Reiniciar todas las marcas de la semana">Reiniciar marcas</button>
+    </div>
+
+    <p class="footer-note">Los datos se guardan localmente en tu navegador · Plan del 30 mayo 2025</p>
+  </main>
+
+  <script>
+    // ========== DATOS DEL PLAN DIETÉTICO ==========
+    const plan = [
+      {
+        id: 1,
+        name: 'Día 1',
+        label: 'Lunes',
+        entreno: false,
+        meals: [
+          { slot: 'Desayuno', name: 'Porridge con leche desnatada sin lactosa, manzana y canela' },
+          { slot: 'Tentempié 1', name: 'Bocadillo de atún, tomate y aceitunas' },
+          { slot: 'Tentempié 2', name: 'Plátano y nueces' },
+          { slot: 'Comida', name: 'Ensalada de patata, bonito y pimientos del piquillo con vinagreta caliente' },
+          { slot: 'Merienda 1', name: 'Manzana' },
+          { slot: 'Cena', name: 'Ensalada mixta + Tortilla francesa + Cuajada con miel' }
+        ]
+      },
+      {
+        id: 2,
+        name: 'Día 2',
+        label: 'Martes',
+        entreno: true,
+        meals: [
+          { slot: 'Desayuno', name: 'Batido de yogur desnatado con pera y melón' },
+          { slot: 'Tentempié 1', name: 'Bocadillo de pavo, tomate y queso fresco' },
+          { slot: 'Tentempié 2', name: 'Melocotón y almendras' },
+          { slot: 'Comida', name: 'Ensalada de pasta con atún, maíz y guisantes' },
+          { slot: 'Merienda 1', name: 'Cerezas' },
+          { slot: 'Cena', name: 'Ensalada de canónigos completa + Merluza a la plancha con alcachofas + Gelatina 0%' }
+        ]
+      },
+      {
+        id: 3,
+        name: 'Día 3',
+        label: 'Miércoles',
+        entreno: false,
+        meals: [
+          { slot: 'Desayuno', name: 'Yogur desnatado con avena, nueces y arándanos' },
+          { slot: 'Tentempié 1', name: 'Bocadillo de jamón serrano y rúcula' },
+          { slot: 'Tentempié 2', name: 'Pera y avellanas' },
+          { slot: 'Comida', name: 'Espaguetis con boloñesa de ternera y espinacas' },
+          { slot: 'Merienda 1', name: 'Albaricoques' },
+          { slot: 'Cena', name: 'Ensalada colorida + Solomillo de pollo a la plancha con tomate y cebolla + Cuajada con miel' }
+        ]
+      },
+      {
+        id: 4,
+        name: 'Día 4',
+        label: 'Jueves',
+        entreno: true,
+        meals: [
+          { slot: 'Desayuno', name: 'Porridge con leche desnatada sin lactosa, manzana y canela' },
+          { slot: 'Tentempié 1', name: 'Bocadillo de atún, tomate y aceitunas' },
+          { slot: 'Tentempié 2', name: 'Plátano y nueces' },
+          { slot: 'Comida', name: 'Ensalada de patata, bonito y pimientos del piquillo con vinagreta caliente' },
+          { slot: 'Merienda 1', name: 'Manzana' },
+          { slot: 'Cena', name: 'Ensalada mixta + Solomillo de ternera a la plancha con habas + Gelatina 0%' }
+        ]
+      },
+      {
+        id: 5,
+        name: 'Día 5',
+        label: 'Viernes',
+        entreno: false,
+        meals: [
+          { slot: 'Desayuno', name: 'Batido de yogur desnatado con pera y melón' },
+          { slot: 'Tentempié 1', name: 'Bocadillo de pavo, tomate y queso fresco' },
+          { slot: 'Tentempié 2', name: 'Melocotón y almendras' },
+          { slot: 'Comida', name: 'Ensalada de pasta con atún, maíz y guisantes' },
+          { slot: 'Merienda 1', name: 'Cerezas' },
+          { slot: 'Cena', name: 'Ensalada de canónigos completa + Tortilla con pechuga de pavo y sésamo + Cuajada con miel' }
+        ]
+      },
+      {
+        id: 6,
+        name: 'Día 6',
+        label: 'Sábado',
+        entreno: false,
+        meals: [
+          { slot: 'Desayuno', name: 'Yogur desnatado con avena, nueces y arándanos' },
+          { slot: 'Tentempié 1', name: 'Bocadillo de jamón serrano y rúcula' },
+          { slot: 'Tentempié 2', name: 'Pera y avellanas' },
+          { slot: 'Comida', name: 'Arroz con espinacas, pimiento rojo y calabacín' },
+          { slot: 'Merienda 1', name: 'Albaricoques' },
+          { slot: 'Cena', name: 'Ensalada colorida + Lomo de cerdo a la plancha con champiñones + Gelatina 0%' }
+        ]
+      },
+      {
+        id: 7,
+        name: 'Día 7',
+        label: 'Domingo',
+        entreno: false,
+        meals: [
+          { slot: 'Desayuno', name: 'Porridge con leche desnatada sin lactosa, manzana y canela' },
+          { slot: 'Tentempié 1', name: 'Bocadillo de hummus y tomate' },
+          { slot: 'Tentempié 2', name: 'Plátano y nueces' },
+          { slot: 'Comida', name: 'Macarrones al queso' },
+          { slot: 'Merienda 1', name: 'Manzana' },
+          { slot: 'Cena', name: 'Ensalada mixta + Salteado de pollo en tiras con pimiento verde + Cuajada con miel' }
+        ]
+      }
+    ];
+
+    // ========== RELOJ EN TIEMPO REAL ==========
+    const diasSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+    function updateClock() {
+      const now = new Date();
+      const dia = diasSemana[now.getDay()];
+      const fecha = `${now.getDate()} de ${meses[now.getMonth()]} de ${now.getFullYear()}`;
+      document.getElementById('clock-date').textContent = `${dia}, ${fecha}`;
+
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('clock-time').innerHTML = `${h}:${m}:<span>${s}</span>`;
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ========== LOCAL STORAGE ==========
+    const STORAGE_KEY = 'plan-dietetico-checks-v1';
+
+    function loadChecks() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveChecks(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    // ========== RENDER CALENDARIO ==========
+    function renderWeek() {
+      const checks = loadChecks();
+      const grid = document.getElementById('week-grid');
+      const today = new Date().getDay(); // 0=domingo ... 6=sábado
+      // Mapear: Día 1 = lunes → 1, Día 7 = domingo → 0
+      const dayMap = { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 0 };
+
+      grid.innerHTML = '';
+
+      plan.forEach(day => {
+        const isToday = dayMap[day.id] === today;
+        const card = document.createElement('div');
+        card.className = `day-card${isToday ? ' today' : ''}`;
+
+        let mealsHtml = day.meals.map((meal, idx) => {
+          const key = `${day.id}-${idx}`;
+          const done = !!checks[key];
+          return `
+            <div class="meal${done ? ' done' : ''}" data-key="${key}">
+              <div class="meal-check"></div>
+              <div class="meal-info">
+                <div class="meal-slot">${meal.slot}</div>
+                <div class="meal-name">${meal.name}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        card.innerHTML = `
+          <div class="day-header${day.entreno ? ' entreno' : ''}">
+            <div class="day-name">
+              ${day.name}
+              ${day.entreno ? '<span class="badge-entreno">Entreno</span>' : ''}
+            </div>
+            <div class="day-label">${day.label}</div>
+          </div>
+          <div class="meals">${mealsHtml}</div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      // Eventos de click
+      document.querySelectorAll('.meal').forEach(el => {
+        el.addEventListener('click', () => {
+          const key = el.dataset.key;
+          const checks = loadChecks();
+          checks[key] = !checks[key];
+          saveChecks(checks);
+          el.classList.toggle('done');
+          updateProgress();
+        });
+      });
+
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const checks = loadChecks();
+      const total = 42; // 7 días × 6 comidas
+      const done = Object.values(checks).filter(Boolean).length;
+      const pct = Math.round((done / total) * 100);
+
+      document.getElementById('progress-text').textContent = `${done} / ${total}`;
+      document.getElementById('progress-fill').style.width = `${pct}%`;
+    }
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      if (confirm('¿Seguro que quieres reiniciar todas las marcas de esta semana?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        renderWeek();
+      }
+    });
+
+    // Iniciar
+    renderWeek();
+  </script>
+</body>
+</html>
